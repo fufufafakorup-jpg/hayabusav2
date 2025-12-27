@@ -1,174 +1,179 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lihat Alamat IP Saya</title>
+    <title>WhatsApp Web Clone (v2025)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Custom Tailwind Colors (optional, but good for consistency) */
+        :root {
+            --whatsapp-green: #075E54; /* Darker green for top bar */
+            --whatsapp-light-green: #128C7E; /* Lighter green for active elements */
+            --whatsapp-bg-light: #ECE5DD; /* Light background for chat area */
+            --whatsapp-text-gray: #4A4A4A; /* General text color */
+        }
+
+        .bg-whatsapp-green { background-color: var(--whatsapp-green); }
+        .text-whatsapp-light-green { color: var(--whatsapp-light-green); }
+        .bg-whatsapp-light-green { background-color: var(--whatsapp-light-green); }
+        .bg-whatsapp-bg-light { background-color: var(--whatsapp-bg-light); }
+        .text-whatsapp-text-gray { color: var(--whatsapp-text-gray); }
+
+        /* Ensure the main container mimics a phone screen */
+        .phone-screen {
+            max-width: 420px; /* Typical phone width */
+            height: 100vh; /* Full viewport height */
+            margin: 0 auto; /* Center the screen */
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: white;
         }
-        .container {
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
+
+        /* Hide scrollbar for a cleaner look, but still allow scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        h1 {
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-        #ip-address {
-            font-size: 2em;
-            font-weight: bold;
-            color: #28a745;
-            margin-top: 15px;
-            word-break: break-all; /* Untuk IP yang sangat panjang */
-        }
-        .loading {
-            color: #6c757d;
-        }
-        .error {
-            color: #dc3545;
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Alamat IP Publik Anda:</h1>
-        <p>Ini adalah alamat IP yang terlihat oleh internet.</p>
-        <p id="ip-address" class="loading">Memuat...</p>
+<body class="bg-gray-100 font-sans antialiased">
+
+    <div class="phone-screen">
+        <!-- Top Bar -->
+        <header class="bg-whatsapp-green text-white p-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold mr-4">WhatsApp</h1>
+                <!-- Search Bar (integrated into top bar) -->
+                <div class="relative flex-grow">
+                    <input type="text" placeholder="Cari..." class="w-full py-1 px-3 pl-10 rounded-full bg-white bg-opacity-20 text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white focus:bg-opacity-30 transition-all duration-200">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white text-sm"></i>
+                </div>
+            </div>
+            <div class="flex space-x-5 ml-4">
+                <button class="text-xl hover:text-gray-200 transition-colors"><i class="fa-solid fa-camera"></i></button>
+                <button class="text-xl hover:text-gray-200 transition-colors"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+        </header>
+
+        <!-- Chat List -->
+        <main class="flex-1 overflow-y-auto hide-scrollbar bg-whatsapp-bg-light relative">
+            <!-- Example Chat Item 1 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=1" alt="Profil John Doe" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">John Doe</h2>
+                    <p class="text-sm text-gray-500 truncate">Oke, sampai jumpa nanti!</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">10:30 AM</div>
+            </div>
+
+            <!-- Example Chat Item 2 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=2" alt="Profil Jane Smith" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Jane Smith</h2>
+                    <p class="text-sm text-gray-500 truncate">Sudah kirim laporannya?</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">Kemarin</div>
+            </div>
+
+            <!-- Example Chat Item 3 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=3" alt="Profil Grup Keluarga" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Grup Keluarga</h2>
+                    <p class="text-sm text-gray-500 truncate">Bibi: Jangan lupa acara besok ya!</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">Selasa</div>
+            </div>
+
+            <!-- Example Chat Item 4 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=4" alt="Profil Toko Online" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Toko Online</h2>
+                    <p class="text-sm text-gray-500 truncate">Pesanan Anda #12345 sedang dalam pengiriman.</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">Senin</div>
+            </div>
+
+            <!-- Example Chat Item 5 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=5" alt="Profil Sarah" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Sarah</h2>
+                    <p class="text-sm text-gray-500 truncate">Aku sudah di jalan, sebentar lagi sampai.</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">09:15 AM</div>
+            </div>
+
+            <!-- Example Chat Item 6 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=6" alt="Profil David" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">David</h2>
+                    <p class="text-sm text-gray-500 truncate">Jangan lupa bawa bukunya ya!</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">08:00 AM</div>
+            </div>
+
+            <!-- Example Chat Item 7 -->
+            <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=7" alt="Profil Tim Kerja" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Tim Kerja</h2>
+                    <p class="text-sm text-gray-500 truncate">Rapat jam 2 siang, jangan telat.</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">07:45 AM</div>
+            </div>
+
+            <!-- Example Chat Item 8 -->
+            <div class="flex items-center p-4 hover:bg-gray-100 cursor-pointer transition-colors">
+                <img src="https://i.pravatar.cc/150?img=8" alt="Profil Ibu" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div class="flex-1">
+                    <h2 class="font-semibold text-gray-800">Ibu</h2>
+                    <p class="text-sm text-gray-500 truncate">Sudah makan nak?</p>
+                </div>
+                <div class="ml-auto text-xs text-gray-400">07:00 AM</div>
+            </div>
+
+            <!-- Floating Action Button (FAB) -->
+            <button class="fixed bottom-20 right-4 bg-whatsapp-light-green text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-emerald-700 transition-colors duration-200 z-10">
+                <i class="fa-solid fa-message text-2xl"></i>
+            </button>
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bg-white border-t border-gray-200 p-2 flex justify-around items-center shadow-inner">
+            <a href="#" class="flex flex-col items-center text-whatsapp-light-green p-2 rounded-lg">
+                <i class="fa-solid fa-comment text-xl mb-1"></i>
+                <span class="text-xs font-semibold">Chat</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-whatsapp-light-green p-2 rounded-lg transition-colors">
+                <i class="fa-solid fa-phone text-xl mb-1"></i>
+                <span class="text-xs">Panggilan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-whatsapp-light-green p-2 rounded-lg transition-colors">
+                <i class="fa-solid fa-arrows-rotate text-xl mb-1"></i>
+                <span class="text-xs">Pembaruan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-whatsapp-light-green p-2 rounded-lg transition-colors">
+                <i class="fa-solid fa-star text-xl mb-1"></i>
+                <span class="text-xs">Fitur</span>
+            </a>
+        </nav>
     </div>
 
-    <script>
-        // Fungsi untuk mengambil dan menampilkan IP
-        async function getPublicIp() {
-            const ipAddressElement = document.getElementById('ip-address');
-            ipAddressElement.textContent = 'Memuat...';
-            ipAddressElement.className = 'loading'; // Reset class
-
-            try {
-                // Menggunakan API ipify.org untuk mendapatkan IP dalam format JSON
-                const response = await fetch('https://api.ipify.org?format=json');
-                
-                // Memeriksa apakah respons berhasil (status 200 OK)
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Menampilkan IP yang didapat
-                ipAddressElement.textContent = data.ip;
-                ipAddressElement.className = ''; // Hapus class loading/error
-            } catch (error) {
-                // Menangani kesalahan jika gagal mengambil IP
-                console.error('Gagal mengambil alamat IP:', error);
-                ipAddressElement.textContent = 'Gagal memuat alamat IP.';
-                ipAddressElement.className = 'error';
-            }
-        }
-
-        // Panggil fungsi saat halaman selesai dimuat
-        window.addEventListener('load', getPublicIp);
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lihat Alamat IP Saya (Teks Biasa)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-        #ip-address-plain {
-            font-size: 2em;
-            font-weight: bold;
-            color: #28a745;
-            margin-top: 15px;
-            word-break: break-all;
-        }
-        .loading {
-            color: #6c757d;
-        }
-        .error {
-            color: #dc3545;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Alamat IP Publik Anda:</h1>
-        <p>Ini adalah alamat IP yang terlihat oleh internet.</p>
-        <p id="ip-address-plain" class="loading">Memuat...</p>
-    </div>
-
-    <script>
-        async function getPublicIpPlain() {
-            const ipAddressElement = document.getElementById('ip-address-plain');
-            ipAddressElement.textContent = 'Memuat...';
-            ipAddressElement.className = 'loading';
-
-            try {
-                // Menggunakan API icanhazip.com yang mengembalikan IP dalam format teks biasa
-                const response = await fetch('https://icanhazip.com/');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.text(); // Menggunakan .text() karena responsnya teks biasa
-                
-                // Menampilkan IP yang didapat, menggunakan .trim() untuk menghapus spasi ekstra
-                ipAddressElement.textContent = data.trim();
-                ipAddressElement.className = '';
-            } catch (error) {
-                console.error('Gagal mengambil alamat IP:', error);
-                ipAddressElement.textContent = 'Gagal memuat alamat IP.';
-                ipAddressElement.className = 'error';
-            }
-        }
-
-        window.addEventListener('load', getPublicIpPlain);
-    </script>
 </body>
 </html>
